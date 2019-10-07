@@ -13,8 +13,10 @@ def main():
 
     pygame.mouse.set_pos((WINDOWWIDTH/2), PADDLEYPOS)
 
-    ballAngle = 30
-    ballDistance = 100
+    ballX = WINDOWWIDTH / 2
+    ballY = WINDOWHEIGHT - 45
+    ballXVel = 5
+    ballYVel = 5
 
     ### MAIN LOOP HERE
     while True:
@@ -26,9 +28,20 @@ def main():
 
         
 
-        drawBall(ballAngle, ballDistance, DISPLAYSURF)
+        ballRect = drawBallXY(ballX, ballY, DISPLAYSURF)
 
-        ballDistance += 5
+        ballX = ballX + ballXVel
+        ballY = ballY + ballYVel
+
+        ballXVel, ballYVel = doBallWallCollision(ballX, ballY, ballXVel, ballYVel)
+        ballXVel, ballYVel = doPaddleCollision(paddleRect, ballRect, ballXVel, ballYVel)
+        checkForQuit()
+
+
+
+
+
+        
 
     
 
@@ -47,7 +60,7 @@ def generateBoard():
     for x in range (BOARDWIDTH):
         column = []
         for y in range(BOARDHEIGHT):
-            column.append('BLOCK')
+            column.append(1)
         board.append(column)
     return board
 
@@ -63,7 +76,7 @@ def drawBoard(board, asurface):
     for boxx in range(BOARDWIDTH):
         for boxy in range(BOARDHEIGHT):
             left, top = leftTopCoordsOfBox(boxx, boxy)
-            if board[boxx][boxy] == 'BLOCK':
+            if board[boxx][boxy] == 1:
                 pygame.draw.rect(asurface, RED, (left, top, BLOCKXLENGTH, BLOCKYHEIGHT))
 
 def drawPaddle(asurface):
@@ -80,14 +93,45 @@ def drawPaddle(asurface):
 
     return paddleRect
 
+def drawBallXY(x, y, asurface):
+    circleSurf = pygame.Surface((20, 20), pygame.SRCALPHA)
+    circleRect = circleSurf.get_rect()
+    circleRect.center = (x, y)
+    pygame.draw.circle(circleSurf, YELLOW, (10, 10), 10)
+    asurface.blit(circleSurf, circleRect)
+    
+    return circleRect
+
 def drawBall(deg, distance, asurface):
 
     x, y = getTrigoXY(deg, distance)
 
     pygame.draw.circle(asurface, YELLOW, (x, y), 10)
+    
+def doBallWallCollision(ballx, bally, ballXVel, ballYVel):
+    checkForQuit()
 
-def doBallDirection(xdirection, ydirection, degrees):
-    pass
+    if ballx < 10:
+        ballXVel = 5
+    
+    if bally < 10:
+        ballYVel = 5
+    
+    if ballx > WINDOWWIDTH-10:
+        ballXVel = -5
+    
+    if bally > WINDOWHEIGHT-10:
+        ballYVel = -5
+
+    return ballXVel, ballYVel        
+
+def doPaddleCollision(paddleRect, ballRect, ballXVel, ballYVel):
+    checkForQuit()
+    if paddleRect.colliderect(ballRect):
+        ballYVel = -5
+    return ballXVel, ballYVel
+
+
 
 
 
