@@ -9,6 +9,7 @@ def main():
     DISPLAYSURF = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
     pygame.display.set_caption('BREAKOUT')
     
+
     board = generateBoard()
 
     pygame.mouse.set_pos((WINDOWWIDTH/2), PADDLEYPOS)
@@ -17,6 +18,7 @@ def main():
     ballY = WINDOWHEIGHT - 45
     ballXVel = 5
     ballYVel = 5
+    
 
     ### MAIN LOOP HERE
     while True:
@@ -35,6 +37,8 @@ def main():
 
         ballXVel, ballYVel = doBallWallCollision(ballX, ballY, ballXVel, ballYVel)
         ballXVel, ballYVel = doPaddleCollision(paddleRect, ballRect, ballXVel, ballYVel)
+        board, ballYVel = doBlockCollision(board, ballRect, ballYVel)
+
         checkForQuit()
 
 
@@ -57,7 +61,7 @@ def main():
 
 def generateBoard():
     board = []
-    for x in range (BOARDWIDTH):
+    for x in range(BOARDWIDTH):
         column = []
         for y in range(BOARDHEIGHT):
             column.append(1)
@@ -78,7 +82,8 @@ def drawBoard(board, asurface):
             left, top = leftTopCoordsOfBox(boxx, boxy)
             if board[boxx][boxy] == 1:
                 pygame.draw.rect(asurface, RED, (left, top, BLOCKXLENGTH, BLOCKYHEIGHT))
-
+            elif board[boxx][boxy] >= 2:
+                pygame.draw.rect(asurface, BLUE, (left, top, BLOCKXLENGTH, BLOCKYHEIGHT))
 def drawPaddle(asurface):
     mousex, mousey = pygame.mouse.get_pos()
     PADDLEXPOS = (mousex - (PADDLEXLENGTH/2))
@@ -132,6 +137,19 @@ def doPaddleCollision(paddleRect, ballRect, ballXVel, ballYVel):
     return ballXVel, ballYVel
 
 
+def doBlockCollision(board, ballRect, ballYVel):
+    checkForQuit()
+    for boxx in range(BOARDWIDTH):
+        for boxy in range(BOARDHEIGHT):
+            if board[boxx][boxy] > 0:
+
+                left, top = leftTopCoordsOfBox(boxx, boxy)
+                boxRect = pygame.Rect(left, top, BLOCKXLENGTH, BLOCKYHEIGHT)
+                if boxRect.colliderect(ballRect):
+                    board[boxx][boxy] -= 1
+                    ballYVel = -ballYVel
+
+    return board, ballYVel
 
 
 
