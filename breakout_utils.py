@@ -26,6 +26,8 @@ XMARGIN = 20
 YMARGIN = 100
 
 
+
+
 #             R    G    B
 WHITE       = (255, 255, 255)
 GRAY        = (185, 185, 185)

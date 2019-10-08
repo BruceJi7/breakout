@@ -3,11 +3,8 @@ import pygame
 from pygame.locals import *
 from breakout_utils import *
 
-def main():
-    pygame.init()
-    FPSCLOCK = pygame.time.Clock()
-    DISPLAYSURF = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
-    pygame.display.set_caption('BREAKOUT')
+def game(DISPLAYSURF):
+    
     
 
     board = generateBoard()
@@ -58,6 +55,27 @@ def main():
 
 
     ### END LOOP
+
+def welcome(DISPLAYSURF):
+    BASICFONT = pygame.font.Font('freesansbold.ttf', 70)
+    introSurf = BASICFONT.render('BREAKOUT!', 1, GREEN) 
+    introRect = introSurf.get_rect()
+    introRect.center = (WINDOWWIDTH /2, WINDOWHEIGHT/2)
+    DISPLAYSURF.blit(introSurf, introRect)
+
+
+    while True:
+        pygame.display.update()
+        FPSCLOCK.tick(FPS)
+
+        for event in pygame.event.get():
+            if event.type == MOUSEBUTTONUP:
+                return
+
+
+
+
+
 
 def generateBoard():
     board = []
@@ -173,7 +191,15 @@ def getBoxAtPixel(x, y):
     return (None, None)
 
 
+def main():
+    global FPSCLOCK
+    pygame.init()
+    FPSCLOCK = pygame.time.Clock()
+    DISPLAYSURF = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
+    pygame.display.set_caption('BREAKOUT')
 
+    welcome(DISPLAYSURF)
+    game(DISPLAYSURF)
 
 
 
