@@ -3,7 +3,18 @@ import pygame
 from pygame.locals import *
 from breakout_utils import *
 
+origXVel = 3
+origYVel = 5
+
 def game(DISPLAYSURF):
+
+    gameState = True
+
+    origXVel = 3
+    origYVel = 5
+
+    ballXVel = 3
+    ballYVel = 5
     
     
 
@@ -13,12 +24,11 @@ def game(DISPLAYSURF):
 
     ballX = WINDOWWIDTH / 2
     ballY = WINDOWHEIGHT - 45
-    ballXVel = 5
-    ballYVel = 5
+
     
 
     ### MAIN LOOP HERE
-    while True:
+    while gameState == True:
         checkForQuit()
         DISPLAYSURF.fill(GRAY)
 
@@ -32,7 +42,7 @@ def game(DISPLAYSURF):
         ballX = ballX + ballXVel
         ballY = ballY + ballYVel
 
-        ballXVel, ballYVel = doBallWallCollision(ballX, ballY, ballXVel, ballYVel)
+        ballXVel, ballYVel, gameState = doBallWallCollision(ballX, ballY, ballXVel, ballYVel, gameState)
         ballXVel, ballYVel = doPaddleCollision(paddleRect, ballRect, ballXVel, ballYVel)
         board, ballYVel = doBlockCollision(board, ballRect, ballYVel)
 
@@ -73,6 +83,23 @@ def welcome(DISPLAYSURF):
                 return
 
 
+def youLose(DISPLAYSURF):
+    BASICFONT = pygame.font.Font('freesansbold.ttf', 70)
+    introSurf = BASICFONT.render('GAME OVER', 1, GREEN) 
+    introRect = introSurf.get_rect()
+    introRect.center = (WINDOWWIDTH /2, WINDOWHEIGHT/2)
+    DISPLAYSURF.blit(introSurf, introRect)
+     
+
+
+    while True:
+        pygame.display.update()
+        FPSCLOCK.tick(FPS)
+        checkForQuit()
+
+        for event in pygame.event.get():
+            if event.type == MOUSEBUTTONUP:
+                return
 
 
 
@@ -131,27 +158,27 @@ def drawBall(deg, distance, asurface):
 
     pygame.draw.circle(asurface, YELLOW, (x, y), 10)
     
-def doBallWallCollision(ballx, bally, ballXVel, ballYVel):
+def doBallWallCollision(ballx, bally, ballXVel, ballYVel, gameState):
     checkForQuit()
 
     if ballx < 10:
-        ballXVel = 5
+        ballXVel = origXVel
     
     if bally < 10:
-        ballYVel = 5
+        ballYVel = origYVel
     
     if ballx > WINDOWWIDTH-10:
-        ballXVel = -5
+        ballXVel = -origXVel
     
     if bally > WINDOWHEIGHT-10:
-        ballYVel = -5
+        gameState = False
 
-    return ballXVel, ballYVel        
+    return ballXVel, ballYVel, gameState        
 
 def doPaddleCollision(paddleRect, ballRect, ballXVel, ballYVel):
     checkForQuit()
     if paddleRect.colliderect(ballRect):
-        ballYVel = -5
+        ballYVel = -origYVel
     return ballXVel, ballYVel
 
 
@@ -192,7 +219,9 @@ def getBoxAtPixel(x, y):
 
 
 def main():
-    global FPSCLOCK
+    global FPSCLOCK, origXVel, origYVel
+
+
     pygame.init()
     FPSCLOCK = pygame.time.Clock()
     DISPLAYSURF = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
@@ -200,6 +229,7 @@ def main():
 
     welcome(DISPLAYSURF)
     game(DISPLAYSURF)
+    youLose(DISPLAYSURF)
 
 
 
